@@ -3,6 +3,69 @@
 {% block title %}Proveedores{% endblock %}
 
 {% block content %}
-    <h1>Lista de Proveedores</h1>
-    <p>Aquí se mostrarán los proveedores registrados.</p>
+    <div class="container">
+        <h1 class="text-center my-4">Lista de Proveedores</h1>
+        
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Contacto</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>Dirección</th>
+                </tr>
+            </thead>
+            <tbody id="proveedores-table-body">
+                <!-- Aquí se insertarán los datos dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- JavaScript para cargar los proveedores desde la API -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("http://127.0.0.1:8000/api/proveedores/")
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Proveedores recibidos:", data); // Debug en consola
+    
+                    // Acceder a `data.results` si la API devuelve paginación
+                    const proveedores = data.results || data;
+    
+                    // Verificar si `proveedores` es un array antes de recorrerlo
+                    if (!Array.isArray(proveedores)) {
+                        console.error("Error: La API no devolvió un array", proveedores);
+                        return;
+                    }
+    
+                    const tableBody = document.getElementById("proveedores-table-body");
+                    tableBody.innerHTML = "";
+    
+                    if (proveedores.length === 0) {
+                        tableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No hay proveedores disponibles</td></tr>";
+                        return;
+                    }
+    
+                    proveedores.forEach(proveedor => {
+                        const row = `
+                            <tr>
+                                <td>${proveedor.id}</td>
+                                <td>${proveedor.nombre}</td>
+                                <td>${proveedor.contacto || "N/A"}</td>
+                                <td>${proveedor.telefono || "N/A"}</td>
+                                <td>${proveedor.email || "N/A"}</td>
+                                <td>${proveedor.direccion || "N/A"}</td>
+                            </tr>
+                        `;
+                        tableBody.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error("Error cargando proveedores:", error));
+        });
+    </script>
+    
+    
+    
 {% endblock %}

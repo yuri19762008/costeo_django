@@ -41,20 +41,24 @@ INSTALLED_APPS = [
     'proveedores',
     'inventario',
     'frontend',  # 🔹 Agregamos la app del frontend
-    
     'rest_framework',
     'django_filters',  # Agregamos filtros
+    'corsheaders',  # Agregamos CORS
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Agregar esta línea
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 ROOT_URLCONF = 'costeo_recetas.urls'
 
