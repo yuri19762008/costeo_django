@@ -15,8 +15,23 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from proveedores.views import ProveedorViewSet, FacturaProveedorViewSet
+from inventario.views import ProductoViewSet, DetalleFacturaViewSet
+from recetas.views import RecetaViewSet, DetalleRecetaViewSet
+
+# Definir el router de DRF
+router = DefaultRouter()
+router.register(r'proveedores', ProveedorViewSet)
+router.register(r'facturas', FacturaProveedorViewSet)
+router.register(r'productos', ProductoViewSet)
+router.register(r'detalle-facturas', DetalleFacturaViewSet)
+router.register(r'recetas', RecetaViewSet)
+router.register(r'detalle-recetas', DetalleRecetaViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),  # Incluye todas las rutas de los modelos registrados con ViewSets
+    path('api/', include('recetas.urls')),  # 🔹 Agregar esta línea para incluir las rutas de la app recetas
 ]
