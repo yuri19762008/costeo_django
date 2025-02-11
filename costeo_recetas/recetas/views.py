@@ -18,9 +18,11 @@ class RecetaViewSet(viewsets.ModelViewSet):
     """
     queryset = Receta.objects.all()
     serializer_class = RecetaSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['nombre']  # Filtra recetas por nombre
-    search_fields = ['nombre']  # Permite búsquedas por nombre
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['nombre']
+    search_fields = ['nombre']
+    ordering_fields = ['nombre']
+    ordering = ['nombre']
 
 class DetalleRecetaViewSet(viewsets.ModelViewSet):
     """
@@ -101,6 +103,4 @@ class ReporteCosteoRecetas(APIView):
         pdf.showPage()
         pdf.save()
         return response
-
-
 

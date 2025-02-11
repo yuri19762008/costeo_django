@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Costeo de Recetas{% endblock %}</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Estilos personalizados -->
+    <style>
+        /* Fuentes y colores modernos */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .content {
+            flex: 1;
+        }
+        /* Navbar estilizado */
+        .navbar {
+            background: linear-gradient(135deg, #343a40, #212529);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .nav-link {
+            font-size: 1.1rem;
+            margin-right: 10px;
+            transition: color 0.3s ease-in-out;
+        }
+        .nav-link:hover {
+            color: #f8b400 !important;
+        }
+        /* Footer estilizado */
+        .footer {
+            background: #212529;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .footer a {
+            color: #f8b400;
+            margin: 0 10px;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out;
+        }
+        .footer a:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'frontend-index' %}">
+                <i class="fa-solid fa-utensils"></i> Costeo de Recetas
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'frontend-index' %}"><i class="fa-solid fa-house"></i> Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'frontend-proveedores' %}"><i class="fa-solid fa-truck"></i> Proveedores</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'frontend-productos' %}"><i class="fa-solid fa-box"></i> Productos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'frontend-recetas' %}"><i class="fa-solid fa-book"></i> Recetas</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <div class="container mt-4 content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer Moderno -->
+    <footer class="footer mt-auto">
+        <div class="container">
+            <p class="mb-2">© 2024 Costeo de Recetas | Todos los derechos reservados</p>
+            <p>
+                <a href="https://tudominio.com"><i class="fa-solid fa-file-contract"></i> Política de Privacidad</a> |
+                <a href="mailto:contacto@costeorecetas.com"><i class="fa-solid fa-envelope"></i> Contacto</a> |
+                <a href="https://www.instagram.com/tuperfil"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://www.facebook.com/tuperfil"><i class="fa-brands fa-facebook"></i></a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

@@ -9,9 +9,11 @@ class ProductoViewSet(viewsets.ModelViewSet):
     """
     queryset = Producto.objects.all()
     serializer_class = ProductoSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['nombre', 'unidad_medida']  # Permite filtrar por nombre y unidad de medida
-    search_fields = ['nombre']  # Permite buscar productos por nombre
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['nombre', 'unidad_medida']
+    search_fields = ['nombre']
+    ordering_fields = ['nombre', 'stock_actual', 'precio_actual']  # Permite ordenar por estos campos
+    ordering = ['nombre']  # Orden predeterminado: alfabético por nombre
 
 class DetalleFacturaViewSet(viewsets.ModelViewSet):
     """
@@ -19,7 +21,6 @@ class DetalleFacturaViewSet(viewsets.ModelViewSet):
     """
     queryset = DetalleFactura.objects.all()
     serializer_class = DetalleFacturaSerializer
-
 
 
 

@@ -21,6 +21,8 @@ from proveedores.views import ProveedorViewSet, FacturaProveedorViewSet
 from inventario.views import ProductoViewSet, DetalleFacturaViewSet
 from recetas.views import RecetaViewSet, DetalleRecetaViewSet
 
+from frontend import views as frontend_views  # Importamos las vistas del frontend
+
 # Definir el router de DRF
 router = DefaultRouter()
 router.register(r'proveedores', ProveedorViewSet)
@@ -34,4 +36,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),  # Incluye todas las rutas de los modelos registrados con ViewSets
     path('api/', include('recetas.urls')),  # 🔹 Agregar esta línea para incluir las rutas de la app recetas
+    path('', frontend_views.index, name='frontend-index'),  # 🔹 Hacer que la página principal sea `/`
+    path('frontend/', include('frontend.urls')),  # 🔹 Mantener las otras rutas del frontend
 ]

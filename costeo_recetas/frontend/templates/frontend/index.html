@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - Costeo de Recetas{% endblock %}
+
+{% block content %}
+    <div class="text-center">
+        <h1>Bienvenido al Sistema de Costeo de Recetas</h1>
+        <p class="lead">Administra tus proveedores, ingredientes y recetas de manera eficiente.</p>
+        <a href="{% url 'frontend-index' %}" class="btn btn-primary">Explorar</a>
+    </div>
+{% endblock %}
