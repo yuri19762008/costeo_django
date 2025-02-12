@@ -1,69 +1,240 @@
 {% extends 'base.html' %}
-
-{% block title %}Recetas{% endblock %}
+{% block title %}Recetas{% endblock %} 
 
 {% block content %}
-    <div class="container">
-        <h1 class="text-center my-4">Lista de Recetas</h1>
-        
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Costo Total</th>
-                </tr>
-            </thead>
-            <tbody id="recetas-table-body">
-                <!-- Aquí se insertarán los datos dinámicamente -->
-            </tbody>
-        </table>
-    </div>
+<div class="container">
+  <h1 class="text-center my-4">Lista de Recetas</h1>
 
-    <!-- JavaScript para cargar las recetas desde la API -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch("http://127.0.0.1:8000/api/recetas/")
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Recetas recibidas:", data); // Debug en consola
-    
-                    // Acceder a `data.results` si la API devuelve paginación
-                    const recetas = data.results || data;
-    
-                    // Verificar si `recetas` es un array antes de recorrerlo
-                    if (!Array.isArray(recetas)) {
-                        console.error("Error: La API no devolvió un array", recetas);
-                        return;
-                    }
-    
-                    const tableBody = document.getElementById("recetas-table-body");
-                    tableBody.innerHTML = "";
-    
-                    if (recetas.length === 0) {
-                        tableBody.innerHTML = "<tr><td colspan='4' class='text-center'>No hay recetas disponibles</td></tr>";
-                        return;
-                    }
-    
-                    recetas.forEach(receta => {
-                        // Si `costo_total` no existe o es null, asignamos 0
-                        const costo = receta.costo_total ? parseFloat(receta.costo_total) : 0;
-    
-                        const row = `
+  <!-- Botón para agregar receta -->
+  <button
+    class="btn btn-success mb-3"
+    data-bs-toggle="modal"
+    data-bs-target="#modalReceta"
+  >
+    <i class="fa-solid fa-plus"></i> Agregar Receta
+  </button>
+
+  <!-- Mensajes de Éxito/Error en Recetas -->
+  <div id="mensaje-alerta-receta" class="alert d-none" role="alert"></div>
+
+  <table id="tabla-recetas" class="table table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Costo Total</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="recetas-table-body"></tbody>
+  </table>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      cargarRecetas();
+
+      // Inicializar DataTables después de cargar los datos
+      setTimeout(() => {
+        $("#tabla-recetas").DataTable({
+          responsive: true,
+          language: {
+            search: "Buscar:",
+            lengthMenu: "Mostrar _MENU_ registros",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ recetas",
+            paginate: {
+              first: "Primero",
+              last: "Último",
+              next: "Siguiente",
+              previous: "Anterior",
+            },
+          },
+        });
+      }, 1000);
+    });
+  </script>
+</div>
+
+<!-- Modal para Agregar/Editar Receta -->
+<div
+  class="modal fade"
+  id="modalReceta"
+  tabindex="-1"
+  aria-labelledby="modalRecetaLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalRecetaLabel">Agregar Receta</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="receta-form">
+          <input type="hidden" id="receta-id" />
+          <div class="mb-3">
+            <label for="receta-nombre" class="form-label">Nombre</label>
+            <input
+              type="text"
+              class="form-control"
+              id="receta-nombre"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="receta-descripcion" class="form-label"
+              >Descripción</label
+            >
+            <textarea
+              class="form-control"
+              id="receta-descripcion"
+              required
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="receta-costo" class="form-label">Costo Total</label>
+            <input
+              type="number"
+              class="form-control"
+              id="receta-costo"
+              step="0.01"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    cargarRecetas();
+
+    document
+      .getElementById("receta-form")
+      .addEventListener("submit", function (event) {
+        event.preventDefault();
+        guardarReceta();
+      });
+  });
+
+  function cargarRecetas() {
+    fetch("http://127.0.0.1:8000/api/recetas/")
+      .then((response) => response.json())
+      .then((data) => {
+        const recetas = data.results || data;
+        const tableBody = document.getElementById("recetas-table-body");
+        tableBody.innerHTML = "";
+
+        if (recetas.length === 0) {
+          tableBody.innerHTML =
+            "<tr><td colspan='5' class='text-center'>No hay recetas disponibles</td></tr>";
+          return;
+        }
+
+        recetas.forEach((receta) => {
+          const row = `
                             <tr>
                                 <td>${receta.id}</td>
                                 <td>${receta.nombre}</td>
-                                <td>${receta.descripcion || "Sin descripción"}</td>
-                                <td>$${costo.toFixed(2)}</td>
+                                <td>${
+                                  receta.descripcion || "Sin descripción"
+                                }</td>
+                                <td>$${parseFloat(
+                                  receta.costo_total || 0
+                                ).toFixed(2)}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" onclick="editarReceta(${
+                                      receta.id
+                                    }, '${receta.nombre}', '${
+            receta.descripcion
+          }', '${receta.costo_total}')">
+                                        <i class="fa-solid fa-edit"></i> Editar
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="eliminarReceta(${
+                                      receta.id
+                                    })">
+                                        <i class="fa-solid fa-trash"></i> Eliminar
+                                    </button>
+                                </td>
                             </tr>
                         `;
-                        tableBody.innerHTML += row;
-                    });
-                })
-                .catch(error => console.error("Error cargando recetas:", error));
+          tableBody.innerHTML += row;
         });
-    </script>
-    
-    
+      })
+      .catch((error) => console.error("Error cargando recetas:", error));
+  }
+
+  function mostrarMensajeReceta(mensaje, tipo) {
+    const alerta = document.getElementById("mensaje-alerta-receta");
+    alerta.textContent = mensaje;
+    alerta.className = `alert alert-${tipo} text-center`;
+    alerta.classList.remove("d-none");
+
+    setTimeout(() => {
+        alerta.classList.add("d-none");
+    }, 3000); // El mensaje desaparece después de 3 segundos
+}
+
+  function guardarReceta() {
+    const id = document.getElementById("receta-id").value;
+    const nombre = document.getElementById("receta-nombre").value;
+    const descripcion = document.getElementById("receta-descripcion").value;
+    const costo = document.getElementById("receta-costo").value;
+
+    const datos = { nombre, descripcion, costo_total: costo };
+    const url = id
+      ? `http://127.0.0.1:8000/api/recetas/${id}/`
+      : "http://127.0.0.1:8000/api/recetas/";
+    const metodo = id ? "PUT" : "POST";
+
+    fetch(url, {
+      method: metodo,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    })
+      .then((response) => response.json())
+      .then(() => {
+        cargarRecetas();
+        document.getElementById("receta-form").reset();
+        document.getElementById("receta-id").value = "";
+        bootstrap.Modal.getInstance(
+          document.getElementById("modalReceta")
+        ).hide();
+
+        // Mostrar mensaje de éxito
+        mostrarMensajeReceta(
+          id ? "Receta actualizada con éxito" : "Receta agregada con éxito",
+          "success"
+        );
+      })
+      .catch(() =>
+        mostrarMensajeReceta("Error al guardar la receta", "danger")
+      );
+  }
+
+  function editarReceta(id, nombre, descripcion, costo) {
+    document.getElementById("receta-id").value = id;
+    document.getElementById("receta-nombre").value = nombre;
+    document.getElementById("receta-descripcion").value = descripcion;
+    document.getElementById("receta-costo").value = costo;
+
+    new bootstrap.Modal(document.getElementById("modalReceta")).show();
+  }
+
+  function eliminarReceta(id) {
+    if (confirm("¿Seguro que quieres eliminar esta receta?")) {
+      fetch(`http://127.0.0.1:8000/api/recetas/${id}/`, { method: "DELETE" })
+        .then(() => cargarRecetas())
+        .catch((error) => console.error("Error eliminando receta:", error));
+    }
+  }
+</script>
 {% endblock %}

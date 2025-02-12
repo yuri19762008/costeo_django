@@ -3,9 +3,47 @@
 {% block title %}Inicio - Costeo de Recetas{% endblock %}
 
 {% block content %}
-    <div class="text-center">
-        <h1>Bienvenido al Sistema de Costeo de Recetas</h1>
-        <p class="lead">Administra tus proveedores, ingredientes y recetas de manera eficiente.</p>
-        <a href="{% url 'frontend-index' %}" class="btn btn-primary">Explorar</a>
+    <div class="container">
+        <h1 class="text-center my-4">Bienvenido al Sistema de Costeo de Recetas</h1>
+        <p class="text-center lead">Administra tus proveedores, productos y recetas de manera eficiente.</p>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body text-center">
+                        <i class="fa-solid fa-truck fa-3x text-primary"></i>
+                        <h5 class="card-title mt-3">Proveedores</h5>
+                        <p class="card-text">Gestiona todos tus proveedores.</p>
+                        <a href="{% url 'frontend-proveedores' %}" class="btn btn-primary">
+                            <i class="fa-solid fa-arrow-right"></i> Ver Proveedores
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body text-center">
+                        <i class="fa-solid fa-box fa-3x text-success"></i>
+                        <h5 class="card-title mt-3">Productos</h5>
+                        <p class="card-text">Controla el inventario y costos.</p>
+                        <a href="{% url 'frontend-productos' %}" class="btn btn-success">
+                            <i class="fa-solid fa-arrow-right"></i> Ver Productos
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body text-center">
+                        <i class="fa-solid fa-book fa-3x text-danger"></i>
+                        <h5 class="card-title mt-3">Recetas</h5>
+                        <p class="card-text">Gestiona tus recetas y costos.</p>
+                        <a href="{% url 'frontend-recetas' %}" class="btn btn-danger">
+                            <i class="fa-solid fa-arrow-right"></i> Ver Recetas
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}

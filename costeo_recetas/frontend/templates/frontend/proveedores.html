@@ -1,55 +1,162 @@
 {% extends 'base.html' %}
+ {% block title %}Proveedores{% endblock %}
+  {% block content %}
+<div class="container">
+  <h1 class="text-center my-4">Lista de Proveedores</h1>
 
-{% block title %}Proveedores{% endblock %}
+  <!-- Botón para agregar proveedor -->
+  <button
+    class="btn btn-success mb-3"
+    data-bs-toggle="modal"
+    data-bs-target="#modalProveedor"
+  >
+    <i class="fa-solid fa-plus"></i> Agregar Proveedor
+  </button>
 
-{% block content %}
-    <div class="container">
-        <h1 class="text-center my-4">Lista de Proveedores</h1>
-        
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Contacto</th>
-                    <th>Teléfono</th>
-                    <th>Email</th>
-                    <th>Dirección</th>
-                </tr>
-            </thead>
-            <tbody id="proveedores-table-body">
-                <!-- Aquí se insertarán los datos dinámicamente -->
-            </tbody>
-        </table>
+  <!-- Agregar un Contenedor para los Mensajes-->
+  <div id="mensaje-alerta" class="alert d-none" role="alert"></div>
+
+  <table id="tabla-proveedores" class="table table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Contacto</th>
+        <th>Teléfono</th>
+        <th>Email</th>
+        <th>Dirección</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="proveedores-table-body"></tbody>
+  </table>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      cargarProveedores();
+
+      // Inicializar DataTables después de cargar los datos
+      setTimeout(() => {
+        $("#tabla-proveedores").DataTable({
+          responsive: true,
+          language: {
+            search: "Buscar:",
+            lengthMenu: "Mostrar _MENU_ registros",
+            info: "Mostrando _START_ a _END_ de _TOTAL_ proveedores",
+            paginate: {
+              first: "Primero",
+              last: "Último",
+              next: "Siguiente",
+              previous: "Anterior",
+            },
+          },
+        });
+      }, 1000); // Esperamos a que los datos se carguen
+    });
+  </script>
+</div>
+
+<!-- Modal para Agregar/Editar Proveedor -->
+<div
+  class="modal fade"
+  id="modalProveedor"
+  tabindex="-1"
+  aria-labelledby="modalProveedorLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="modalProveedorLabel">
+          <i class="fa-solid fa-user-plus"></i> Agregar Proveedor
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="proveedor-form">
+          <input type="hidden" id="proveedor-id" />
+
+          <div class="mb-3">
+            <label for="proveedor-nombre" class="form-label"
+              >Nombre <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              id="proveedor-nombre"
+              required
+            />
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <label for="proveedor-contacto" class="form-label"
+                >Contacto</label
+              >
+              <input type="text" class="form-control" id="proveedor-contacto" />
+            </div>
+            <div class="col-md-6">
+              <label for="proveedor-telefono" class="form-label"
+                >Teléfono</label
+              >
+              <input type="text" class="form-control" id="proveedor-telefono" />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="proveedor-email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="proveedor-email" />
+          </div>
+
+          <div class="mb-3">
+            <label for="proveedor-direccion" class="form-label"
+              >Dirección</label
+            >
+            <input type="text" class="form-control" id="proveedor-direccion" />
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="fa-solid fa-save"></i> Guardar
+          </button>
+        </form>
+      </div>
     </div>
+  </div>
+</div>
 
-    <!-- JavaScript para cargar los proveedores desde la API -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch("http://127.0.0.1:8000/api/proveedores/")
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Proveedores recibidos:", data); // Debug en consola
-    
-                    // Acceder a `data.results` si la API devuelve paginación
-                    const proveedores = data.results || data;
-    
-                    // Verificar si `proveedores` es un array antes de recorrerlo
-                    if (!Array.isArray(proveedores)) {
-                        console.error("Error: La API no devolvió un array", proveedores);
-                        return;
-                    }
-    
-                    const tableBody = document.getElementById("proveedores-table-body");
-                    tableBody.innerHTML = "";
-    
-                    if (proveedores.length === 0) {
-                        tableBody.innerHTML = "<tr><td colspan='6' class='text-center'>No hay proveedores disponibles</td></tr>";
-                        return;
-                    }
-    
-                    proveedores.forEach(proveedor => {
-                        const row = `
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    cargarProveedores();
+
+    document
+      .getElementById("proveedor-form")
+      .addEventListener("submit", function (event) {
+        event.preventDefault();
+        guardarProveedor();
+      });
+  });
+
+  function cargarProveedores() {
+    fetch("http://127.0.0.1:8000/api/proveedores/")
+      .then((response) => response.json())
+      .then((data) => {
+        const proveedores = data.results || data;
+        const tableBody = document.getElementById("proveedores-table-body");
+        tableBody.innerHTML = "";
+
+        if (proveedores.length === 0) {
+          tableBody.innerHTML =
+            "<tr><td colspan='7' class='text-center'>No hay proveedores disponibles</td></tr>";
+          return;
+        }
+
+        proveedores.forEach((proveedor) => {
+          const row = `
                             <tr>
                                 <td>${proveedor.id}</td>
                                 <td>${proveedor.nombre}</td>
@@ -57,15 +164,99 @@
                                 <td>${proveedor.telefono || "N/A"}</td>
                                 <td>${proveedor.email || "N/A"}</td>
                                 <td>${proveedor.direccion || "N/A"}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" onclick="editarProveedor(${
+                                      proveedor.id
+                                    }, '${proveedor.nombre}', '${
+            proveedor.contacto
+          }', '${proveedor.telefono}', '${proveedor.email}', '${
+            proveedor.direccion
+          }')">
+                                        <i class="fa-solid fa-edit"></i> Editar
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="eliminarProveedor(${
+                                      proveedor.id
+                                    })">
+                                        <i class="fa-solid fa-trash"></i> Eliminar
+                                    </button>
+                                </td>
                             </tr>
                         `;
-                        tableBody.innerHTML += row;
-                    });
-                })
-                .catch(error => console.error("Error cargando proveedores:", error));
+          tableBody.innerHTML += row;
         });
-    </script>
-    
-    
-    
+      })
+      .catch((error) => console.error("Error cargando proveedores:", error));
+  }
+
+  function mostrarMensaje(mensaje, tipo) {
+    const alerta = document.getElementById("mensaje-alerta");
+    alerta.textContent = mensaje;
+    alerta.className = `alert alert-${tipo} text-center`;
+    alerta.classList.remove("d-none");
+
+    setTimeout(() => {
+        alerta.classList.add("d-none");
+    }, 3000); // El mensaje desaparece después de 3 segundos
+}
+
+  function guardarProveedor() {
+    const id = document.getElementById("proveedor-id").value;
+    const nombre = document.getElementById("proveedor-nombre").value;
+    const contacto = document.getElementById("proveedor-contacto").value;
+    const telefono = document.getElementById("proveedor-telefono").value;
+    const email = document.getElementById("proveedor-email").value;
+    const direccion = document.getElementById("proveedor-direccion").value;
+
+    const datos = { nombre, contacto, telefono, email, direccion };
+    const url = id
+      ? `http://127.0.0.1:8000/api/proveedores/${id}/`
+      : "http://127.0.0.1:8000/api/proveedores/";
+    const metodo = id ? "PUT" : "POST";
+
+    fetch(url, {
+      method: metodo,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    })
+      .then((response) => response.json())
+      .then(() => {
+        cargarProveedores();
+        document.getElementById("proveedor-form").reset();
+        document.getElementById("proveedor-id").value = "";
+        bootstrap.Modal.getInstance(
+          document.getElementById("modalProveedor")
+        ).hide();
+
+        // Mostrar mensaje de éxito
+        mostrarMensaje(
+          id
+            ? "Proveedor actualizado con éxito"
+            : "Proveedor agregado con éxito",
+          "success"
+        );
+      })
+      .catch(() => mostrarMensaje("Error al guardar el proveedor", "danger"));
+  }
+
+  function editarProveedor(id, nombre, contacto, telefono, email, direccion) {
+    document.getElementById("proveedor-id").value = id;
+    document.getElementById("proveedor-nombre").value = nombre;
+    document.getElementById("proveedor-contacto").value = contacto;
+    document.getElementById("proveedor-telefono").value = telefono;
+    document.getElementById("proveedor-email").value = email;
+    document.getElementById("proveedor-direccion").value = direccion;
+
+    new bootstrap.Modal(document.getElementById("modalProveedor")).show();
+  }
+
+  function eliminarProveedor(id) {
+    if (confirm("¿Seguro que quieres eliminar este proveedor?")) {
+      fetch(`http://127.0.0.1:8000/api/proveedores/${id}/`, {
+        method: "DELETE",
+      })
+        .then(() => cargarProveedores())
+        .catch((error) => console.error("Error eliminando proveedor:", error));
+    }
+  }
+</script>
 {% endblock %}
