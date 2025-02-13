@@ -19,7 +19,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from proveedores.views import ProveedorViewSet, FacturaProveedorViewSet
 from inventario.views import ProductoViewSet, DetalleFacturaViewSet
-from recetas.views import RecetaViewSet, DetalleRecetaViewSet
+from recetas.views import RecetaViewSet, IngredienteViewSet, lista_recetas
 
 from frontend import views as frontend_views  # Importamos las vistas del frontend
 
@@ -30,7 +30,7 @@ router.register(r'facturas', FacturaProveedorViewSet)
 router.register(r'productos', ProductoViewSet)
 router.register(r'detalle-facturas', DetalleFacturaViewSet)
 router.register(r'recetas', RecetaViewSet)
-router.register(r'detalle-recetas', DetalleRecetaViewSet)
+router.register(r'detalle-recetas', IngredienteViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -38,4 +38,5 @@ urlpatterns = [
     path('api/', include('recetas.urls')),  # 🔹 Agregar esta línea para incluir las rutas de la app recetas
     path('', frontend_views.index, name='frontend-index'),  # 🔹 Hacer que la página principal sea `/`
     path('frontend/', include('frontend.urls')),  # 🔹 Mantener las otras rutas del frontend
+    path("frontend/recetas/", lista_recetas, name="lista_recetas"),  # 🔹 Agregar la ruta de la vista lista_recetas
 ]

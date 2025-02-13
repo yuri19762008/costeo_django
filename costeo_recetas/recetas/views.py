@@ -1,6 +1,6 @@
 from rest_framework import viewsets, filters
-from .models import Receta, DetalleReceta
-from .serializers import RecetaSerializer, DetalleRecetaSerializer
+from .models import Receta, Ingrediente
+from .serializers import RecetaSerializer, IngredienteSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -10,26 +10,16 @@ from django.http import HttpResponse
 from rest_framework import serializers
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from django.shortcuts import render
 
 
 class RecetaViewSet(viewsets.ModelViewSet):
-    """
-    API para gestionar recetas
-    """
     queryset = Receta.objects.all()
     serializer_class = RecetaSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['nombre']
-    search_fields = ['nombre']
-    ordering_fields = ['nombre']
-    ordering = ['nombre']
-
-class DetalleRecetaViewSet(viewsets.ModelViewSet):
-    """
-    API para gestionar los ingredientes dentro de una receta
-    """
-    queryset = DetalleReceta.objects.all()
-    serializer_class = DetalleRecetaSerializer
+    
+class IngredienteViewSet(viewsets.ModelViewSet):  # Antes era DetalleRecetaViewSet
+    queryset = Ingrediente.objects.all()
+    serializer_class = IngredienteSerializer
 
 class RecetaSerializer(serializers.ModelSerializer):
     costo_total = serializers.SerializerMethodField()  # Agregamos un campo calculado
@@ -104,3 +94,14 @@ class ReporteCosteoRecetas(APIView):
         pdf.save()
         return response
 
+import json
+
+def lista_recetas(request):
+    recetas = Receta.objects.all()
+    for receta in recetas:
+        try:
+            receta.ingredientes = json.loads(receta.ingredientes)  # Convertir string JSON a lista Python
+        except:
+            receta.ingredientes = []  # Si hay un error, asignar lista vacía
+
+    return render(request, "recetas.html", {"recetas": recetas})

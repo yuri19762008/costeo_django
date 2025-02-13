@@ -1,15 +1,18 @@
 from rest_framework import serializers
-from .models import Receta, DetalleReceta
+from recetas.models import Receta, Ingrediente
+from inventario.models import Producto
+
+class IngredienteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingrediente
+        fields = '__all__'
+
 
 class RecetaSerializer(serializers.ModelSerializer):
+    ingredientes = IngredienteSerializer(many=True, read_only=True)
+
     class Meta:
         model = Receta
-        fields = '__all__'  # Devuelve todos los campos en JSON
+        fields = ['id', 'nombre', 'descripcion', 'costo_total', 'ingredientes']
 
-class DetalleRecetaSerializer(serializers.ModelSerializer):
-    receta = RecetaSerializer(read_only=True)  # Muestra la información de la receta
-    producto = serializers.StringRelatedField()  # Muestra solo el nombre del producto
 
-    class Meta:
-        model = DetalleReceta
-        fields = '__all__'
